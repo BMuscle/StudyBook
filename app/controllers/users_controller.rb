@@ -6,5 +6,7 @@ class UsersController < ApplicationController
 
   def get_user
     @user = current_user
+    "めちゃめちゃテスト"
+    {{"aa"}}
   end
 end
