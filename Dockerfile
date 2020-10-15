@@ -5,6 +5,7 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
 	&& apt-get install -y nodejs yarn \
 	&& apt-get install -y graphviz \
 	&& apt-get install -y postgresql-client \
+	&& apt-get install -y gosu
 	&& mkdir /myapp
 WORKDIR /myapp
 COPY Gemfile /myapp/Gemfile
