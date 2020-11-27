@@ -11,6 +11,11 @@ module Api
         end
       end
 
+      def downloads
+        @notes = @user.notes.includes(:category, :tags).where('notes.updated_at >= ?', params[:updated_at])
+        @deleted_notes = @user.deleted_notes
+      end
+
       def destroys
         @notes = @user.notes.where(guid: (destroy_note_params[:notes].map { |note| note[:guid] })).destroy_all
       end
@@ -18,11 +23,11 @@ module Api
       private
 
       def put_note_params
-        params.permit(notes: [:local_id, :guid, :title, :text, :category_id, { tags: [:id, :name] }])
+        params.permit(notes: [:local_id, :guid, :title, :body, :category_id, { tags: [:id, :name] }])
       end
 
       def permit_note_params(note_params)
-        note_params.permit(:title, :text, :category_id, :file_path)
+        note_params.permit(:title, :body, :category_id, :directory_path)
       end
 
       def destroy_note_params

@@ -1,22 +1,29 @@
 class Note < ApplicationRecord
   belongs_to :user
   belongs_to :category
-  has_many :note_tags
+  has_many :note_tags, dependent: :destroy
   has_many :tags, through: :note_tags
 
-  has_many :my_list_notes
+  has_many :my_list_notes, dependent: :destroy
   has_many :my_lists, through: :my_list_notes
 
   validates :user_id, presence: true
   validates :category_id, presence: true
   validates :title, presence: true, length: { maximum: 50 }
-  validates :text, presence: true, length: { maximum: 30000 }
-  validates :file_path, length: { maximum: 255 }
+  validates :body, presence: true, length: { maximum: 30000 }
+  validates :directory_path, length: { maximum: 255 }
 
-  before_create :add_uuid
+  before_create :add_guid
+  before_destroy :move_deleted_note
 
-  def add_uuid
+  scope :full_search, ->(query) { where('notes.title @@ ? OR notes.body @@ ?', query, query) }
+
+  def add_guid
     self.guid = SecureRandom.uuid
+  end
+
+  def move_deleted_note
+    throw(:abort) unless DeletedNote.note_save(guid, user_id)
   end
 
   def create_note_tags(tags)
@@ -47,7 +54,7 @@ class Note < ApplicationRecord
 
     def directory_tree
       directory_tree = {}
-      pluck(:file_path).uniq.sort.each do |path|
+      pluck(:directory_path).uniq.sort.each do |path|
         create_folders(path, directory_tree)
       end
       directory_tree
