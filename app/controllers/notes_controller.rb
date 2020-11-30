@@ -1,10 +1,12 @@
 class NotesController < ApplicationController
+  include Pagy::Backend   # Pagyを使えるようになる魔法の呪文
   before_action :get_note, only: [:show]
   def index
     @notes = Note.includes(:user, :category, :tags)
     @notes = @notes.where(category_id: params[:category]) if params[:category].present?
     @notes = @notes.order(created_at: "DESC") if params[:order] == 'create'
     @notes = @notes.order(updated_at: "DESC")
+    @pagy, @notes = pagy(@notes)
   end
 
   private
