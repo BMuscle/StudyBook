@@ -42,6 +42,9 @@
             - note.tags.each do |tag|
               .notes__note-tag
                 = tag.name
-      <%== pagy_nav(@pagy) %>
+
+      != pagy_nav(@pagy)
+
+
   .right.col-2
 #new_my_list_form
